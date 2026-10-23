@@ -18,7 +18,7 @@ python -m bratan.main [--no-body] [--no-eyes] [--no-voice]
 | `face` | `client.py` | клиент Android-приложения (HTTP 8766, токены по областям) |
 | — | `cli.py` | `tail`, `pub`, `get`, `autonomy on|off` с ПК или телефона |
 
-Подробный разбор алгоритмов — в [главном README](../README.md#как-это-работает); история решений и источники — [`ARCHITECTURE.md`](ARCHITECTURE.md).
+Подробный разбор алгоритмов — в [главном README](../README.ru.md#как-это-работает); история решений и источники — [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Настройки
 
