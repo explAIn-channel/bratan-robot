@@ -1,0 +1,537 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Уши Братана</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@600&display=swap">
+<style>
+/* Layout: монтажный стол — 3D-сцена слева, шаги сборки справа (на телефоне — друг под другом) */
+:root{
+  --bg:#edf1f0; --panel:#ffffff; --ink:#15201f; --muted:#56696a; --line:#d2dcda;
+  --accent:#0d6b72; --accent-ink:#ffffff; --scene:#dde6e4; --grid:#c2cfcc; --chip:#f1f5f4;
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1415; --panel:#151f21; --ink:#e3ebe9; --muted:#93a6a4; --line:#283739;
+  --accent:#5cc3c9; --accent-ink:#06292b; --scene:#111a1b; --grid:#223031; --chip:#1b282a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1415; --panel:#151f21; --ink:#e3ebe9; --muted:#93a6a4; --line:#283739;
+  --accent:#5cc3c9; --accent-ink:#06292b; --scene:#111a1b; --grid:#223031; --chip:#1b282a; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:16px 28px}
+.wrap{max-width:1380px;margin:0 auto;display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(22px,3vw,30px);margin:0;letter-spacing:.01em;text-wrap:balance}
+header p{margin:0;color:var(--muted);min-width:0}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+@media (max-width:980px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;height:clamp(380px,72vh,800px);border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--scene)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#tags{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.tag{position:absolute;left:0;top:0;transform:translate(-50%,-50%);white-space:nowrap;font-family:var(--f-body);font-size:12px;font-weight:600;
+  background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tag.big{font-size:13px}
+.tag.pin{font-family:var(--f-mono);font-size:11px;padding:1px 5px;border-width:2px}
+.tag.col{font-family:var(--f-mono);font-size:10px;padding:0 4px;font-weight:700}
+.tag.dim{opacity:.55}
+.views{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px)}
+.views button,.ctl button{font:inherit;font-size:13px;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
+.views button:hover,.ctl button:hover{border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{position:absolute;right:10px;bottom:10px;font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 8px;max-width:calc(100% - 20px)}
+aside{display:grid;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.ctl{display:flex;gap:8px;flex-wrap:wrap}
+.ctl .play{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);min-width:110px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.steps button{width:100%;text-align:left;font:inherit;font-size:14px;background:transparent;border:1px solid transparent;color:var(--ink);border-radius:8px;padding:6px 8px;display:flex;gap:10px;align-items:center;cursor:pointer}
+.steps button:hover{background:var(--chip)}
+.steps button[aria-current="step"]{background:var(--chip);border-color:var(--accent)}
+.steps .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);width:18px;flex:none;text-align:right}
+.steps .sw{width:14px;height:6px;border-radius:3px;flex:none}
+.now h2{font-size:17px;margin:0 0 6px;text-wrap:balance}
+.now p{margin:0 0 10px;color:var(--ink)}
+.chips{display:flex;flex-direction:column;gap:5px}
+.chip{display:flex;gap:8px;align-items:center;background:var(--chip);border-radius:8px;padding:5px 8px;font-family:var(--f-mono);font-size:12.5px;min-width:0}
+.chip .sw{width:10px;height:10px;border-radius:50%;flex:none}
+.chip span{min-width:0;overflow-wrap:anywhere}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:5px;border-radius:3px;margin-right:5px;vertical-align:middle}
+details summary{cursor:pointer;font-weight:600}
+.tbl{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td.m{font-family:var(--f-mono);font-size:12px}
+.note{font-size:13px;color:var(--muted);margin:0}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Уши Братана</h1>
+    <p>Три микрофона INMP441 → макетка 170 точек → ESP32 DevKit на 30 ножек. Без сверления: все три — в готовые проёмы корпуса (зелёные кольца): спереди внизу под телефоном и в прорези на боках; бледный на заду — место четвёртого. Крути сцену мышкой или пальцем, шаги идут сами — можно поставить на паузу.</p>
+  </header>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="gl" aria-label="3D-схема подключения микрофонов"></canvas>
+      <div id="tags"></div>
+      <div class="views" role="group" aria-label="Ракурс">
+        <button type="button" data-view="all">Общий вид</button>
+        <button type="button" data-view="top">Сверху</button>
+        <button type="button" data-view="bb">Макетка крупно</button>
+        <button type="button" data-view="mic">Микрофон крупно</button>
+        <button type="button" id="hullBtn">Корпус: прозрачный</button>
+      </div>
+      <div class="hint">Левая кнопка — вращать · колесо — приблизить · правая — сдвинуть</div>
+    </div>
+
+    <aside>
+      <div class="card">
+        <div class="ctl">
+          <button type="button" id="prev">← Назад</button>
+          <button type="button" id="play" class="play">Пауза</button>
+          <button type="button" id="next">Дальше →</button>
+        </div>
+      </div>
+      <div class="card now" id="now" aria-live="polite"></div>
+      <div class="card">
+        <ol class="steps" id="steps"></ol>
+      </div>
+      <div class="card">
+        <div class="legend" id="legend"></div>
+        <p class="note" style="margin-top:8px">Цвета проводов условные: бери любые, важно только куда втыкать.</p>
+      </div>
+      <div class="card">
+        <details>
+          <summary>Полный список проводов (три микрофона)</summary>
+          <div class="tbl"><table id="table"><thead><tr><th>Откуда</th><th>Куда на макетке</th><th>Провод</th></tr></thead><tbody></tbody></table></div>
+        </details>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="robot-model.js"></script>
+<script>
+(function(){
+const T = THREE;
+const REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- данные схемы (все размеры в миллиметрах) ---------- */
+const COL = { v33:'#e03131', gnd:'#66727c', sck:'#f08c00', ws:'#1c7ed6', sd1:'#2f9e44', sd2:'#ae3ec9', lr:'#e0b000', usb:'#8d969e' };
+const NAME = { v33:'питание 3V3', gnd:'земля GND', sck:'такт SCK', ws:'такт WS', sd1:'данные 1', sd2:'данные 2', lr:'выбор канала L/R', usb:'USB' };
+/* Сцена: y вверх, перёд робота = −z. Модель корпуса R5 (робот: x вперёд, y влево, z вверх, 0 = пол)
+   переводится так: сцена = (−y_робота, z_робота − 199, 21.6 − x_робота). Крыша корпуса — на высоте 199 мм → y=0 сцены. */
+const S = (x,y,z) => new T.Vector3(z, y-199, 21.6-x);           // точка из координат GLB (x вперёд, y вверх, z вправо)
+const SN = (x,y,z) => new T.Vector3(z, y, -x).normalize();
+const FLOOR_IN = S(0,27,0).y;                                     // дно корпуса изнутри (27 мм от пола)
+const E = new T.Vector3(-68, FLOOR_IN+4.5, 116);    // ESP32 лежит на дне под задней крышкой
+const B = new T.Vector3(2, FLOOR_IN+4.25, 111);    // макетка рядом (клеится своим липким слоем)
+const BB_H = 8.5, bbTop = B.y + BB_H/2;
+const ROWZ = {a:-13.97,b:-11.43,c:-8.89,d:-6.35,e:-3.81,f:3.81,g:6.35,h:8.89,i:11.43,j:13.97};
+const hole = (c,r) => new T.Vector3(B.x+(c-9)*2.54, bbTop, B.z+ROWZ[r]);
+/* ESP32-WROOM-32 DevKit, 30 ножек: штырьки со стороны без надписей, поэтому плата лежит штырьками вверх (надписи и
+   модуль — к дну). Тогда ряд EN…VIN справа (к макетке), ряд D23…3V3 слева; счёт от антенны к USB. */
+const NPIN = 15, PIN0 = -(NPIN-1)*2.54/2;
+const ESP_R = ['EN','VP','VN','D34','D35','D32','D33','D25','D26','D27','D14','D12','D13','GND','VIN'];
+const ESP_L = ['D23','D22','TX0','RX0','D21','D19','D18','D5','TX2','RX2','D4','D2','D15','GND','3V3'];
+const ESP_USE = {'3V3':[-1,14], 'GND':[-1,13], 'D32':[1,5], 'D33':[1,6], 'D25':[1,7], 'D26':[1,8]};
+const espPinPos = n => { const [sd,i] = ESP_USE[n]; return new T.Vector3(E.x+sd*12.7, E.y, E.z+PIN0+i*2.54); };
+const UP = new T.Vector3(0,1,0);
+/* inner — точка на внутренней поверхности стенки (замерено лучом по модели), n — наружу, thick — толщина стенки */
+function micAt(id, ru, where, inner, n, thick){
+  const t = new T.Vector3().crossVectors(n,UP).normalize(), u = new T.Vector3().crossVectors(t,n);
+  return {id, ru, where, n, t, u, c: inner.clone().addScaledVector(n,-1.6), wall: inner.clone().addScaledVector(n,thick+0.15)}; }
+/* 16.10, владелец: «чтобы ничего не сверлить» — в готовые проёмы корпуса, все низко (≈70–80 мм от пола). */
+const MICS = [
+  micAt('M1','М1','перёд по центру: проём у самого низа',     S(219,35,0),       SN(1,0,0), 1.8),
+  micAt('M2','М2','правый бок: наклонные прорези сзади внизу', S(-84,71,110.5),   SN(0,0,1), 5.4),
+  micAt('M3','М3','левый бок: наклонные прорези сзади внизу',  S(-84,71,-110.5),  SN(0,0,-1), 5.4),
+  micAt('M4','М4','зад: проём внизу — четвёртый, позже',      S(-176,60,0),      SN(-0.971,0.238,0), 1.7),
+];
+const micOf = id => MICS.find(m => m.id === id);
+const MPIN = {'SCK':[2.6,-2.54],'WS':[2.6,0],'L/R':[2.6,2.54],'SD':[-2.6,-2.54],'VDD':[-2.6,0],'GND':[-2.6,2.54]};
+const micPinBase = (m,p) => m.c.clone().addScaledVector(m.n,-0.8).addScaledVector(m.u,MPIN[p][0]).addScaledVector(m.t,MPIN[p][1]);
+const along = (m,d) => m.c.clone().addScaledVector(m.n,-d);
+
+/* провода: from = ['esp', pin] | ['mic', id, pin] | ['jmp', col, row]; to = [col,row] */
+const WIRES = [];
+const add = (g,from,to,kind) => WIRES.push({g,from,to,kind});
+add('v33',['esp','3V3'],[2,'a'],'мама-папа');
+add('v33',['mic','M1','VDD'],[2,'b'],'мама-папа');
+add('v33',['mic','M2','VDD'],[2,'c'],'мама-папа');
+add('v33',['mic','M3','VDD'],[2,'d'],'мама-папа');
+add('v33',['jmp',2,'e'],[3,'e'],'папа-папа');
+add('v33',['mic','M4','VDD'],[3,'a'],'мама-папа');
+add('gnd',['esp','GND'],[5,'a'],'мама-папа');
+add('gnd',['mic','M1','GND'],[5,'b'],'мама-папа');
+add('gnd',['mic','M2','GND'],[5,'c'],'мама-папа');
+add('gnd',['mic','M3','GND'],[5,'d'],'мама-папа');
+add('gnd',['jmp',5,'e'],[6,'e'],'папа-папа');
+add('gnd',['mic','M4','GND'],[6,'a'],'мама-папа');
+add('sck',['esp','D26'],[8,'a'],'мама-папа');
+['M1','M2','M3','M4'].forEach((m,i)=>add('sck',['mic',m,'SCK'],[8,'bcde'[i]],'мама-папа'));
+add('ws',['esp','D25'],[10,'a'],'мама-папа');
+['M1','M2','M3','M4'].forEach((m,i)=>add('ws',['mic',m,'WS'],[10,'bcde'[i]],'мама-папа'));
+add('sd1',['esp','D33'],[12,'a'],'мама-папа');
+add('sd1',['mic','M1','SD'],[12,'b'],'мама-папа');
+add('sd1',['mic','M2','SD'],[12,'c'],'мама-папа');
+add('sd2',['esp','D32'],[14,'a'],'мама-папа');
+add('sd2',['mic','M3','SD'],[14,'b'],'мама-папа');
+add('sd2',['mic','M4','SD'],[14,'c'],'мама-папа');
+add('lr',['mic','M1','L/R'],[6,'b'],'мама-папа');
+add('lr',['mic','M3','L/R'],[6,'c'],'мама-папа');
+add('lr',['mic','M2','L/R'],[3,'b'],'мама-папа');
+add('lr',['mic','M4','L/R'],[3,'c'],'мама-папа');
+add('usb',['usb'],null,'кабель USB');
+
+/* 16.10: четвёртый микрофон ещё едет — его провода не рисуем, сам он показан бледным на своём месте (зад). */
+const LATER = 'M4';
+WIRES.splice(0, WIRES.length, ...WIRES.filter(w => !(w.from[0]==='mic' && w.from[1]===LATER)));
+const COLCAP = {2:['3V3','v33'],3:['3V3','v33'],5:['GND','gnd'],6:['GND','gnd'],8:['SCK','sck'],10:['WS','ws'],12:['SD1','sd1'],14:['SD2','sd2']};
+
+const STEPS = [
+  {g:null, t:'Что где лежит',
+   p:'Это твой настоящий корпус R5. Сверлить ничего не нужно: микрофоны встают в готовые проёмы корпуса, низко, около 3–8 см от пола (16.10, идея владельца). М1 — спереди по центру, в проёме у самого низа передней стенки (≈3–4 см от пола, под телефоном): оттуда, где экран, с роботом и говорят; М2 — за наклонными прорезями сзади внизу на правом боку; М3 — за такими же прорезями на левом боку. Бледный на заду — четвёртый, когда приедет: в проём внизу задней стенки. Расчёт для трёх: обычно 1°, 9 из 10 направлений ≤ 4°, лучше всего — спереди. М1 — изнутри за нижним проёмом, дырочкой в проём; проём узкий (≈1 см в высоту), плата встаёт за ним. Сначала посмотреть, что за проёмом: если там датчик базы (окошко ИК), его не закрывать — сдвинуть плату вбок по проёму. Пока робот сам говорит, направление не считается — динамик рядом. Микрофон крепится изнутри: плата дырочкой к проёму (дырочка — на стороне с надписями), вплотную, на каплю термоклея или двусторонний скотч по краю, без клея на самой дырочке; кусочек тонкого поролона снаружи платы — от пыли и сквозняка. У прорезей — так, чтобы дырочка смотрела прямо в одну из щелей. Зелёные кольца снаружи показывают места. Штырьки смотрят внутрь корпуса. Плата ESP и макетка лежат на дне корпуса под задней крышкой — макетка клеится своим липким слоем. ESP (DevKit на 30 ножек) — штырьками вверх, надписями к дну, на поролоновой подложке; USB — к задней крышке, чтобы до него можно было дотянуться. В макетке пять дырок одного столбика (a–e) соединены; используем только верхнюю половину. Кнопка «Корпус» сверху делает его прозрачным, сплошным или прячет.'},
+  {g:'v33', t:'Питание 3V3',
+   p:'Ножка 3V3 платы и VDD всех четырёх микрофонов сходятся в столбиках 2 и 3. В одном столбике всего пять дырок, поэтому два столбика соединяем короткой перемычкой папа-папа.'},
+  {g:'gnd', t:'Земля GND',
+   p:'Так же, как питание: GND платы и GND всех микрофонов — столбики 5 и 6, между ними перемычка.'},
+  {g:'sck', t:'Такт SCK',
+   p:'Один провод от ножки D26 и четыре от SCK микрофонов — все в столбик 8. Плата этим проводом «тикает» для всех микрофонов сразу.'},
+  {g:'ws', t:'Такт WS',
+   p:'Ножка D25 и WS всех четырёх микрофонов — столбик 10. Это второй такт: «сейчас левый, сейчас правый».'},
+  {g:'sd1', t:'Данные: перед и правый',
+   p:'Ножка D33 и SD микрофонов М1 (перед) и М2 (правый бок) — столбик 12. По одному проводу данных идут два микрофона, по очереди.'},
+  {g:'sd2', t:'Данные: левый бок',
+   p:'Ножка D32 и SD микрофона М3 (левый бок) — столбик 14. Дырка 14c останется под четвёртый микрофон (зад), когда он приедет.'},
+  {g:'lr', t:'Кто левый, кто правый',
+   p:'L/R решает, в какую половинку такта микрофон отвечает. М1 и М3 — на землю (столбик 5 или 6), М2 — на 3V3 (столбик 2 или 3). Четвёртый потом — тоже на 3V3. Свободным L/R оставлять нельзя.'},
+  {g:'usb', t:'Питание платы',
+   p:'Плату питаем 5 В робота через понижайку (не меньше 2 А) — как от компьютера по USB. Микрофоны берут питание с её ножки 3V3; ножка VIN (5 В) микрофонам не годится.'},
+  {g:'all', t:'Всё вместе: как это работает',
+   p:'Плата шлёт такт всем четырём микрофонам одновременно (оранжевые и синие точки бегут к микрофонам), а каждый отвечает своими данными (зелёные и фиолетовые — обратно к плате). Звук приходит на микрофоны в разное время — по этой разнице робот поймёт, откуда его зовут.'}
+];
+const STEP_OF = {}; STEPS.forEach((s,i)=>{ if(s.g) STEP_OF[s.g]=i; });
+const FINAL = STEPS.length-1;
+
+/* ---------- three.js ---------- */
+const stage = document.getElementById('stage');
+const canvas = document.getElementById('gl');
+const tagsBox = document.getElementById('tags');
+const renderer = new T.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio||1));
+const scene = new T.Scene();
+const camera = new T.PerspectiveCamera(38, 1, 1, 4000);
+const controls = new T.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 30; controls.maxDistance = 1200;
+
+scene.add(new T.HemisphereLight(0xffffff, 0x8899a0, .75));
+const sun = new T.DirectionalLight(0xffffff, .75); sun.position.set(160,320,220); scene.add(sun);
+const fill = new T.DirectionalLight(0xffffff, .25); fill.position.set(-200,120,-180); scene.add(fill);
+
+const mat = (c,o={}) => new T.MeshStandardMaterial(Object.assign({color:c, roughness:.6, metalness:.05}, o));
+function rrect(w,h,r){ const s=new T.Shape(), x=-w/2, y=-h/2;
+  s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r); s.lineTo(x+w,y+h-r);
+  s.quadraticCurveTo(x+w,y+h,x+w-r,y+h); s.lineTo(x+r,y+h); s.quadraticCurveTo(x,y+h,x,y+h-r);
+  s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y); return s; }
+function box(w,h,d,m,x,y,z){ const o=new T.Mesh(new T.BoxGeometry(w,h,d),m); o.position.set(x,y,z); scene.add(o); return o; }
+
+/* пол-сетка */
+let grid;
+function makeGrid(){ if(grid) scene.remove(grid);
+  const c = css('--grid');
+  grid = new T.GridHelper(900, 45, c, c); grid.position.y = S(0,0,0).y; grid.material.transparent = true; grid.material.opacity = .7; grid.renderOrder = -2; scene.add(grid); }
+
+/* настоящий корпус R5 (FULL_ROBOT_new_front_cover.glb) */
+const HULL_MODES = [['glass','прозрачный'],['solid','сплошной'],['hide','спрятан']];
+let hullMode = 0; const hullMats = [];
+const robot = new T.Group(); robot.rotation.y = Math.PI/2; robot.position.set(0,-199,21.6); scene.add(robot);
+function applyHull(){ const k = HULL_MODES[hullMode][0];
+  robot.visible = k!=='hide';
+  for(const m of hullMats){ m.transparent = k==='glass'; m.opacity = k==='glass' ? (m.userData.orange ? .42 : .3) : 1; m.depthWrite = k!=='glass'; m.needsUpdate = true; }
+  document.getElementById('hullBtn').textContent = 'Корпус: ' + HULL_MODES[hullMode][1]; }
+document.getElementById('hullBtn').addEventListener('click',()=>{ hullMode=(hullMode+1)%HULL_MODES.length; applyHull(); });
+function loadRobot(onLoad, onErr){
+  // Without the embedded copy, take the body model from the repository (needs a local http server).
+  if(!window.ROBOT_GLB_B64){ new T.GLTFLoader().load('../../body/bratan_body_r5.glb', onLoad, undefined, onErr); return; }
+  try{ const s = atob(window.ROBOT_GLB_B64), buf = new Uint8Array(s.length); for(let i=0;i<s.length;i++) buf[i]=s.charCodeAt(i);
+       new T.GLTFLoader().parse(buf.buffer, '', onLoad, onErr); }catch(e){ onErr(e); } }
+if(T.GLTFLoader) loadRobot(g=>{
+  g.scene.traverse(o=>{ if(!o.isMesh) return;
+    const src = o.material, col = src.color ? src.color.clone() : new T.Color(0xeeeeee);
+    const m = new T.MeshStandardMaterial({color:col, roughness:.75, metalness:0, side:T.DoubleSide});
+    m.userData.orange = col.r > .8 && col.g < .5; o.material = m; hullMats.push(m); });
+  robot.add(g.scene); applyHull();
+}, ()=>{ document.getElementById('hullBtn').textContent = 'Корпус не загрузился'; });
+else document.getElementById('hullBtn').textContent = 'Корпус не загрузился';
+
+/* лидар на рамке (рамка — часть модели) */
+const LID = S(24.2,236.1,0);
+box(79,3,55, mat(0x2b3034), LID.x,LID.y+1.5,LID.z);
+const head = new T.Mesh(new T.CylinderGeometry(27.5,27.5,31,40), mat(0x1f2427,{roughness:.4}));
+head.position.set(LID.x+10,LID.y+3+15.5,LID.z); scene.add(head);
+const pul = new T.Mesh(new T.CylinderGeometry(6,6,4,24), mat(0x50585e)); pul.position.set(LID.x-28,LID.y+5,LID.z); scene.add(pul);
+
+/* ---------- ESP32 DevKit 30 ножек (штырьками вверх: сверху белая сторона без надписей) ---------- */
+function texCanvas(w,h){ const c=document.createElement('canvas'); c.width=w; c.height=h; return [c, c.getContext('2d')]; }
+function espTexture(){
+  const S=20, W=28.3, L=51.5; const [c,x]=texCanvas(Math.round(W*S), Math.round(L*S));
+  x.fillStyle='#e9ebe6'; x.fillRect(0,0,c.width,c.height);
+  const P=(mx,mz)=>[(mx+W/2)*S,(mz+L/2)*S];
+  x.strokeStyle='#d7dad3'; x.lineWidth=5;
+  for(const [a,b,d,e] of [[-8,-14,4,0],[4,0,4,9],[-6,4,2,12],[2,12,9,12],[-9,-4,-3,-4],[-3,-4,-3,7]]){
+    const [x1,y1]=P(a,b), [x2,y2]=P(d,e); x.beginPath(); x.moveTo(x1,y1); x.lineTo(x2,y2); x.stroke(); }
+  for(const [mx,mz] of [[-11.6,-23.2],[11.6,-23.2],[-11.6,23.2],[11.6,23.2]]){ const [px,py]=P(mx,mz);
+    x.fillStyle='#c9a24a'; x.beginPath(); x.arc(px,py,30,0,7); x.fill(); x.fillStyle='#3a3d40'; x.beginPath(); x.arc(px,py,21,0,7); x.fill(); }
+  for(let i=0;i<NPIN;i++){ for(const s of [-1,1]){ const [px,py]=P(s*12.7,PIN0+i*2.54);
+      x.fillStyle='#c9a24a'; x.beginPath(); x.arc(px,py,17,0,7); x.fill(); x.fillStyle='#121617'; x.beginPath(); x.arc(px,py,7,0,7); x.fill(); } }
+  const t=new T.CanvasTexture(c); t.anisotropy=8; return t;
+}
+function roundRect(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
+box(28.3,1.6,51.5, mat(0x1a1d1f), E.x,E.y,E.z);
+const espTop = new T.Mesh(new T.PlaneGeometry(28.3,51.5), new T.MeshStandardMaterial({map:espTexture(),roughness:.8}));
+espTop.rotation.x=-Math.PI/2; espTop.position.set(E.x,E.y+0.81,E.z); scene.add(espTop);
+for(const s of [-1,1]) box(2.5,2.5,NPIN*2.54, mat(0x1b1f22), E.x+s*12.7, E.y+0.8+1.25, E.z);
+const pinMat = mat(0xd8c27a,{metalness:.7,roughness:.35});
+for(let i=0;i<NPIN;i++) for(const s of [-1,1]) box(.64,6,.64,pinMat,E.x+s*12.7,E.y+0.8+2.5+3,E.z+PIN0+i*2.54);
+box(18,3,25.5, mat(0xb9bec2,{metalness:.6,roughness:.4}), E.x,E.y-2.3,E.z-11);     // модуль ESP-32 — к дну
+box(8,3,6, mat(0xa9aeb2,{metalness:.7,roughness:.3}), E.x,E.y-2.3,E.z+23.5);        // micro-USB — к дну
+
+/* ---------- макетка 170 точек ---------- */
+function bbTexture(){
+  const S=20, W=46, D=35; const [c,x]=texCanvas(W*S,D*S);
+  x.fillStyle='#f3f3ef'; x.fillRect(0,0,c.width,c.height);
+  const P=(mx,mz)=>[(mx+W/2)*S,(mz+D/2)*S];
+  for(const [col,[txt,g]] of Object.entries(COLCAP)){ const [px,py1]=P((col-9)*2.54,ROWZ.a); const [,py2]=P(0,ROWZ.e);
+    x.fillStyle=COL[g]; x.globalAlpha=.28; roundRect(x,px-22,py1-24,44,py2-py1+48,12); x.fill(); x.globalAlpha=1; }
+  x.fillStyle='#d6d6d0'; x.fillRect(0,P(0,-1.3)[1],c.width,2.6*S);
+  x.fillStyle='#3a3d40';
+  for(let col=1;col<=17;col++) for(const r of 'abcdefghij'){ const [px,py]=P((col-9)*2.54,ROWZ[r]); x.fillRect(px-11,py-11,22,22); }
+  x.fillStyle='#6b7075'; x.font='bold 22px monospace'; x.textAlign='center'; x.textBaseline='middle';
+  for(let col=1;col<=17;col++){ const [px]=P((col-9)*2.54,0); x.fillText(String(col),px,P(0,-16.3)[1]); x.fillText(String(col),px,P(0,16.3)[1]); }
+  for(const r of 'abcdefghij'){ const [,py]=P(0,ROWZ[r]); x.fillText(r,P(-21.4,0)[0],py); x.fillText(r,P(21.4,0)[0],py); }
+  const t=new T.CanvasTexture(c); t.anisotropy=8; return t;
+}
+box(46,BB_H,35, mat(0xeeeeea), B.x,B.y,B.z);
+const bbTopPlane = new T.Mesh(new T.PlaneGeometry(46,35), new T.MeshStandardMaterial({map:bbTexture(),roughness:.9}));
+bbTopPlane.rotation.x=-Math.PI/2; bbTopPlane.position.set(B.x,bbTop+0.05,B.z); scene.add(bbTopPlane);
+
+/* ---------- микрофоны INMP441 на стенках корпуса (изнутри) ---------- */
+const micPcb = mat(0x15191b), micGold = mat(0xd9b24c,{metalness:.7,roughness:.3});
+const quatOf = m => new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(m.n, m.u, m.t)); // местная x → наружу
+function place(o, m, pos){ o.quaternion.copy(quatOf(m)); o.position.copy(pos); scene.add(o); (m.meshes = m.meshes || []).push(o); return o; }
+for(const m of MICS){
+  const dg = new T.CylinderGeometry(7,7,1.6,40); dg.rotateZ(Math.PI/2);
+  place(new T.Mesh(dg, micPcb), m, m.c);
+  const rg = new T.TorusGeometry(6.2,.35,8,40); rg.rotateY(Math.PI/2);
+  place(new T.Mesh(rg, micGold), m, m.c.clone().addScaledVector(m.n,.85));
+  place(new T.Mesh(new T.BoxGeometry(1.2,4.7,3.8), mat(0xc8ccd0,{metalness:.7,roughness:.3})), m,
+        along(m,1.4).addScaledVector(UP,-.4).addScaledVector(m.t,-3.2));                       // чип — на внутренней стороне
+  const fg = new T.TorusGeometry(5.2,1.1,8,32); fg.rotateY(Math.PI/2);                          // поролоновое колечко между платой и стенкой
+  place(new T.Mesh(fg, mat(0x4a4f55,{roughness:1})), m, m.c.clone().addScaledVector(m.n,1.2));
+  const hg = new T.CircleGeometry(1.4,20); hg.rotateY(Math.PI/2);
+  place(new T.Mesh(hg, new T.MeshBasicMaterial({color:0x111111, side:T.DoubleSide})), m, m.wall.clone().addScaledVector(m.n,.05));
+  for(const p of Object.keys(MPIN)) place(new T.Mesh(new T.BoxGeometry(9,.64,.64), pinMat), m, micPinBase(m,p).addScaledVector(m.n,-4.5));
+  place(new T.Mesh(new T.BoxGeometry(2.5,7.6,7.8), mat(0x1b1f22)), m, along(m,0.8+1.25+1.6));   // пластик гребёнки
+}
+
+/* четвёртый — призрак: полупрозрачный, без проводов */
+for(const o of (micOf(LATER).meshes || [])){ o.material = o.material.clone(); o.material.transparent = true; o.material.opacity = .28; o.material.depthWrite = false; }
+/* «сверлить здесь»: яркое кольцо снаружи стенки вокруг отверстия; у четвёртого — серое, позже */
+for(const m of MICS){ const later = m.id===LATER;
+  const g = new T.TorusGeometry(8,1.4,10,44); g.rotateY(Math.PI/2);
+  const ring = new T.Mesh(g, new T.MeshBasicMaterial({color: later ? 0x9aa0a4 : 0x12b886, transparent: later, opacity: later ? .55 : 1}));
+  ring.quaternion.copy(quatOf(m)); ring.position.copy(m.wall.clone().addScaledVector(m.n,.8)); scene.add(ring); }
+
+/* ---------- провода ---------- */
+const housingMat = mat(0x262b2f,{roughness:.5});
+function mkHousing(len, vertical, m){ const g = vertical ? new T.BoxGeometry(2.6,len,2.6) : new T.BoxGeometry(len,2.6,2.6); const o=new T.Mesh(g,housingMat);
+  if(m) o.quaternion.copy(quatOf(m)); scene.add(o); return o; }
+const SLACK = 25;    // запас на изгибы и крепление проводов по стенке, мм
+let seq = 0;
+for(const w of WIRES){
+  const pts=[]; w.housings=[]; w.jit = ((seq++ % 7) - 3) * 1.1;
+  if(w.from[0]==='mic'){
+    const m=micOf(w.from[1]), b=micPinBase(m,w.from[2]), h=hole(...w.to);
+    const hs = mkHousing(13,false,m); hs.position.copy(b.clone().addScaledVector(m.n,-9.5)); w.housings.push({o:hs,at:0});
+    const p1 = b.clone().addScaledVector(m.n,-16.5), p2 = b.clone().addScaledVector(m.n,-32).add(new T.Vector3(0,-4,0)).addScaledVector(m.t,w.jit);
+    const top = new T.Vector3(h.x, bbTop+28, h.z);
+    const mid = p2.clone().lerp(top,.5); mid.y = (p2.y+top.y)/2 + 18 + w.jit; mid.x += w.jit;
+    pts.push(p1, p2, mid, top, new T.Vector3(h.x, bbTop+12, h.z));
+    const he = mkHousing(12,true); he.position.set(h.x,bbTop+6,h.z); w.housings.push({o:he,at:1});
+    w.fromTxt = `${m.ru} ${w.from[2]}`; w.tagAt = b.clone().addScaledVector(m.n,-16.5).addScaledVector(m.u,2.6);
+  } else if(w.from[0]==='esp'){
+    const p=espPinPos(w.from[1]), h=hole(...w.to), top=E.y+0.8+2.5;
+    const hs = mkHousing(13,true); hs.position.set(p.x, top+1+6.5, p.z); w.housings.push({o:hs,at:0});
+    pts.push(new T.Vector3(p.x, top+14, p.z), new T.Vector3(p.x, top+30, p.z),
+      new T.Vector3((p.x+h.x)/2, Math.max(top,bbTop)+32, (p.z+h.z)/2-8), new T.Vector3(h.x, bbTop+28, h.z), new T.Vector3(h.x, bbTop+12, h.z));
+    const he = mkHousing(12,true); he.position.set(h.x,bbTop+6,h.z); w.housings.push({o:he,at:1});
+    w.fromTxt = `ESP ${w.from[1]}`; w.tagAt = new T.Vector3(p.x+3, top+18, p.z);
+  } else if(w.from[0]==='jmp'){
+    const a=hole(w.from[1],w.from[2]), h=hole(...w.to);
+    const hs = mkHousing(9,true); hs.position.set(a.x,bbTop+4.5,a.z); w.housings.push({o:hs,at:0});
+    pts.push(new T.Vector3(a.x,bbTop+9,a.z), new T.Vector3((a.x+h.x)/2,bbTop+15,a.z+1.5), new T.Vector3(h.x,bbTop+9,h.z));
+    const he = mkHousing(9,true); he.position.set(h.x,bbTop+4.5,h.z); w.housings.push({o:he,at:1});
+    w.fromTxt = `перемычка ${w.from[1]}${w.from[2]}`; w.tagAt = null;
+  } else {
+    pts.push(new T.Vector3(E.x, E.y-1.5, E.z+27), new T.Vector3(E.x-3, E.y+3, E.z+42), new T.Vector3(E.x-18, E.y+12, E.z+54), new T.Vector3(E.x-45, E.y+22, E.z+60));
+    w.fromTxt = 'USB платы'; w.tagAt = new T.Vector3(E.x-45, E.y+28, E.z+60);
+  }
+  w.curve = new T.CatmullRomCurve3(pts, false, 'centripetal');
+  const r = w.g==='usb' ? 1.8 : (w.from[0]==='jmp' ? .6 : .75);
+  const geo = new T.TubeGeometry(w.curve, 80, r, 7, false);
+  w.segIdx = 7*6; w.segs = 80;
+  w.mat = new T.MeshStandardMaterial({color:COL[w.g], roughness:.45, transparent:true, opacity:1});
+  w.mesh = new T.Mesh(geo, w.mat); scene.add(w.mesh);
+  w.progress = 0; w.delay = 0;
+  w.toTxt = w.to ? `столбик ${w.to[0]}, дырка ${w.to[1]}` : 'к 5 В робота';
+  w.len = w.curve.getLength();
+
+}
+/* сколько длинных проводов нужно — пишем в первый шаг */
+/* длина проводов — одна на все 6 проводов микрофона, по самому длинному */
+{ const need = {};
+  for(const w of WIRES) if(w.from[0]==='mic') need[w.from[1]] = Math.max(need[w.from[1]]||0, w.len + SLACK);
+  const cm = mm => mm <= 200 ? 20 : mm <= 300 ? 30 : 40;
+  for(const w of WIRES) if(w.from[0]==='mic'){ const c = cm(need[w.from[1]]); w.cm = c;
+    w.kind = c===20 ? 'мама-папа 20 см' : c===30 ? 'мама-папа 30 см (или две по 20 см цепочкой)' : 'мама-папа 40 см или две по 20 см цепочкой'; }
+  const live = MICS.filter(m => need[m.id]);
+  const longs = live.filter(m => cm(need[m.id]) > 20), shorts = live.filter(m => cm(need[m.id]) === 20);
+  if(longs.length) STEPS[0].p += ` Длина проводов: ${shorts.map(m=>m.ru).join(', ')} — хватает обычных мама-папа 20 см (по ${shorts.map(m=>Math.round(need[m.id]/10)).join('/')} см с запасом). ` +
+    longs.map(m=>`${m.ru} далеко от макетки (≈${Math.round(need[m.id]/10)} см с запасом) — 6 проводов ${cm(need[m.id])} см или по две 20-сантиметровых цепочкой: штекер одной в гнездо другой, стык обмотать изолентой.`).join(' '); }
+/* бегущие точки (последний шаг) */
+const beadGeo = new T.SphereGeometry(1.3,12,10);
+for(const w of WIRES){ w.beads=[];
+  const flow = (w.g==='sck'||w.g==='ws') ? (w.from[0]==='esp'?1:-1) : (w.g==='sd1'||w.g==='sd2') ? (w.from[0]==='esp'?-1:1) : 0;
+  w.flow = flow; if(!flow) continue;
+  for(let k=0;k<3;k++){ const b=new T.Mesh(beadGeo,new T.MeshBasicMaterial({color:COL[w.g]})); b.visible=false; scene.add(b); w.beads.push(b); } }
+
+/* ---------- подписи ---------- */
+const TAGS=[];
+function tag(text, pos, cls, show, color){ const el=document.createElement('div'); el.className='tag '+(cls||''); el.textContent=text;
+  if(color) el.style.borderColor=color; tagsBox.appendChild(el); TAGS.push({el,pos,show:show||(()=>true)}); return el; }
+tag('ESP32 DevKit 30 ножек · штырьками вверх, USB к задней крышке', new T.Vector3(E.x-6,E.y+14,E.z+40), 'big');
+tag('Макетка 170 точек', new T.Vector3(B.x+6,bbTop+2,B.z+26), 'big');
+tag('Рамка лидара', new T.Vector3(0,25,64), 'big');
+tag('Лидар — моторчик гудит, микрофоны от него подальше', new T.Vector3(LID.x+10,LID.y+50,LID.z), '');
+tag('Окно и крепление телефона', S(205,175,0), '');
+tag('↑ ПЕРЁД', S(275,30,0), '');
+tag('Большое боковое окно', S(30,130,-125), 'dim');
+tag('Дно корпуса', S(-125,27,-70), 'dim');
+for(const m of MICS) tag(`${m.ru} · ${m.where}`, m.wall.clone().addScaledVector(m.n,30).addScaledVector(UP,14), 'big');
+for(const m of MICS){ const later = m.id===LATER;
+  tag(later ? 'позже — в этот проём' : 'сюда, в готовый проём', m.wall.clone().addScaledVector(m.n,16).addScaledVector(UP,-14),
+      later ? 'dim' : '', null, later ? null : '#12b886'); }
+for(const [col,[txt,g]] of Object.entries(COLCAP)){ const h=hole(+col,'a'); tag(`${col} ${txt}`, new T.Vector3(h.x,bbTop+1,h.z-6.5), 'col', null, COL[g]); }
+for(const w of WIRES){ if(!w.tagAt) continue;
+  const txt = w.from[0]==='esp' ? w.from[1] : w.from[0]==='mic' ? w.from[2] : '5 В';
+  tag(txt, w.tagAt, 'pin', ()=> cur===STEP_OF[w.g], COL[w.g]); }
+
+/* ---------- состояние шагов ---------- */
+let cur = 0, playing = !REDUCED, hold = 0, t0 = performance.now(), clock = 0;
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888'; }
+function goStep(i){
+  cur = Math.max(0, Math.min(FINAL, i)); hold = 0;
+  let k=0;
+  for(const w of WIRES){ const s=STEP_OF[w.g];
+    if(cur===FINAL || s<cur){ w.progress = 1; }
+    else if(s===cur){ w.progress = REDUCED ? 1 : 0; w.delay = k++ * .16; }
+    else w.progress = 0; }
+  renderPanel();
+}
+function update(dt){
+  if(playing){
+    let done = true;
+    for(const w of WIRES){ if(STEP_OF[w.g]!==cur || cur===FINAL) continue;
+      if(w.delay>0){ w.delay-=dt; done=false; continue; }
+      if(w.progress<1){ w.progress=Math.min(1,w.progress+dt/1.1); done=false; } }
+    if(done && cur<FINAL){ hold+=dt; if(hold > (cur===0?6:3.4)) goStep(cur+1); }
+    clock += dt;
+  }
+  for(const w of WIRES){ const s=STEP_OF[w.g];
+    const vis = cur===FINAL || s<=cur; const bright = cur===FINAL || s===cur;
+    const p = vis ? w.progress : 0;
+    w.mesh.visible = p>0.001;
+    w.mesh.geometry.setDrawRange(0, Math.ceil(p*w.segs)*w.segIdx);
+    w.mat.opacity = bright ? 1 : .3;
+    for(const h of w.housings){ h.o.visible = vis && (h.at===0 ? p>0.01 : p>=.99); h.o.material = housingMat; }
+    const showBeads = cur===FINAL && w.beads.length;
+    w.beads.forEach((b,k)=>{ b.visible = !!showBeads && !REDUCED;
+      if(b.visible){ let t=(((clock*.32 + k/3 + w.jit*.01)%1)+1)%1; if(w.flow<0) t=1-t; b.position.copy(w.curve.getPointAt(t)); } });
+  }
+}
+
+/* ---------- панель ---------- */
+const stepsEl=document.getElementById('steps'), nowEl=document.getElementById('now'), playBtn=document.getElementById('play');
+STEPS.forEach((s,i)=>{ const li=document.createElement('li'); const b=document.createElement('button'); b.type='button';
+  b.innerHTML=`<span class="n">${i}</span><span class="sw" style="background:${s.g&&COL[s.g]||'transparent'}"></span><span>${s.t}</span>`;
+  b.addEventListener('click',()=>goStep(i)); li.appendChild(b); stepsEl.appendChild(li); });
+function renderPanel(){
+  [...stepsEl.querySelectorAll('button')].forEach((b,i)=> b.setAttribute('aria-current', i===cur?'step':'false'));
+  const s=STEPS[cur];
+  const list = WIRES.filter(w=>w.g===s.g);
+  nowEl.innerHTML = `<h2>${cur}. ${s.t}</h2><p>${s.p}</p>` + (list.length ? '<div class="chips">'+list.map(w=>
+    `<div class="chip"><i class="sw" style="background:${COL[w.g]}"></i><span>${w.fromTxt} → ${w.toTxt}${w.cm>20?' · <b>'+w.cm+' см</b>':''}</span></div>`).join('')+'</div>' : '');
+  playBtn.textContent = playing ? 'Пауза' : (cur===FINAL ? 'Играть' : 'Продолжить');
+}
+document.getElementById('prev').onclick=()=>goStep(cur-1);
+document.getElementById('next').onclick=()=>goStep(cur+1);
+playBtn.onclick=()=>{ playing=!playing; renderPanel(); };
+window.addEventListener('keydown',e=>{ if(e.key==='ArrowRight') goStep(cur+1); if(e.key==='ArrowLeft') goStep(cur-1); if(e.key===' '&&e.target===document.body){ e.preventDefault(); playing=!playing; renderPanel(); } });
+document.getElementById('legend').innerHTML = Object.entries(NAME).map(([g,n])=>`<span><i style="background:${COL[g]}"></i>${n}</span>`).join('');
+document.querySelector('#table tbody').innerHTML = WIRES.map(w=>`<tr><td class="m">${w.fromTxt}</td><td class="m">${w.toTxt}</td><td>${w.kind}</td></tr>`).join('');
+
+/* ---------- ракурсы ---------- */
+const VIEWS = {
+  all:{p:[430,170,-480], t:[0,-90,20]},
+  top:{p:[0,780,60], t:[0,-90,20]},
+  bb:{p:[70,30,300], t:[-8,-160,108]},
+  mic:{p:[230,0,-400], t:[80,-55,-160]},
+};
+let fly=null;
+let micIdx = 0; const micBtn = document.querySelector('[data-view="mic"]');
+function micView(){ const m = MICS[micIdx]; micBtn.textContent = `Микрофон крупно: ${m.ru}`;
+  const p = m.wall.clone().addScaledVector(m.n,150).addScaledVector(UP,45).addScaledVector(m.t,70);
+  return {p:p.toArray(), t:m.c.toArray()}; }
+function setView(k, instant){ if(k==='mic'){ VIEWS.mic = micView(); micIdx = (micIdx+1)%MICS.length; } const v=VIEWS[k]; const P=new T.Vector3(...v.p), Tg=new T.Vector3(...v.t);
+  if(instant||REDUCED){ camera.position.copy(P); controls.target.copy(Tg); controls.update(); return; }
+  fly={p0:camera.position.clone(), t0:controls.target.clone(), p1:P, t1:Tg, a:0}; }
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+setView('all', true);
+
+/* ---------- подписи: проекция ---------- */
+const v3=new T.Vector3();
+function placeTags(w,h){
+  for(const t of TAGS){ const on = t.show(); if(!on){ t.el.style.display='none'; continue; }
+    v3.copy(t.pos).project(camera);
+    if(v3.z>1 || v3.x<-1.1 || v3.x>1.1 || v3.y<-1.1 || v3.y>1.1){ t.el.style.display='none'; continue; }
+    t.el.style.display=''; t.el.style.transform=`translate(${(v3.x*.5+.5)*w}px,${(-v3.y*.5+.5)*h}px) translate(-50%,-50%)`; }
+}
+
+/* ---------- тема ---------- */
+function applyTheme(){ renderer.setClearColor(css('--scene')); makeGrid(); }
+applyTheme();
+if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* ---------- размер и цикл ---------- */
+function resize(){ const w=stage.clientWidth, h=stage.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+goStep(0);
+let last=performance.now();
+function loop(now){ const dt=Math.min(.05,(now-last)/1000); last=now;
+  if(fly){ fly.a=Math.min(1,fly.a+dt/.8); const e=fly.a<.5?2*fly.a*fly.a:1-Math.pow(-2*fly.a+2,2)/2;
+    camera.position.lerpVectors(fly.p0,fly.p1,e); controls.target.lerpVectors(fly.t0,fly.t1,e); if(fly.a>=1) fly=null; }
+  update(dt); controls.update(); renderer.render(scene,camera); placeTags(stage.clientWidth, stage.clientHeight);
+  requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>

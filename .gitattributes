@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.onnx binary
+*.pgm binary
+*.npy binary
+*.npz binary
+*.stl binary
+*.glb binary
+*.gif binary
+*.jpg binary
+*.png binary

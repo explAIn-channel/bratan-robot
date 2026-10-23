@@ -1,0 +1,184 @@
+{
+  "research_only": true,
+  "motion_authority": false,
+  "runtime_compatible": false,
+  "production_changed": false,
+  "promotion_performed": false,
+  "training_repeated": false,
+  "purpose": "Numeric parity only; raw quality gate remains failed; guarded system and device acceptance separate.",
+  "checkpoint_sha256": "deebff361ef3f94ae009e64c9db61304cf8187ca98b58cb004c0e6f0c2b20796",
+  "contract": {
+    "schema": "robotbrain.rosnav-shadow.policy-contract.v1",
+    "features": {
+      "dtype": "float32",
+      "dimension": 228,
+      "layout": [
+        {
+          "name": "lidar_current",
+          "offset": 0,
+          "size": 72,
+          "temporal_offset_s": 0.0
+        },
+        {
+          "name": "lidar_history_1",
+          "offset": 72,
+          "size": 72,
+          "temporal_offset_s": 0.3
+        },
+        {
+          "name": "lidar_history_2",
+          "offset": 144,
+          "size": 72,
+          "temporal_offset_s": 2.0
+        },
+        {
+          "name": "local_path_xy",
+          "offset": 216,
+          "size": 10
+        },
+        {
+          "name": "measured_twist",
+          "offset": 226,
+          "size": 2
+        }
+      ],
+      "lidar_bins_per_view": 72,
+      "path_points": 5,
+      "view_offsets_s": [
+        0.0,
+        0.3,
+        2.0
+      ],
+      "history_maximum_gap_s": 0.75,
+      "history_selection": "latest_sample_not_after_target",
+      "history_warmup_s": 2.0,
+      "laser_yaw_rad": 1.5062,
+      "range_encoding": "log",
+      "path_scale_m": 2.0,
+      "path_sampling": "uniform_near_arc_length_v1",
+      "path_lookahead_m": 1.0,
+      "path_source": "causal_local_map_replan_v1",
+      "linear_velocity_scale_mps": 0.5,
+      "angular_velocity_scale_radps": 2.0
+    },
+    "geometry": {
+      "frame": "base_link",
+      "footprint_m": [
+        [
+          0.2259172,
+          0.1429509
+        ],
+        [
+          0.2259172,
+          -0.1429509
+        ],
+        [
+          -0.1827,
+          -0.1429509
+        ],
+        [
+          -0.1827,
+          0.1429509
+        ]
+      ],
+      "guard_footprint_m": [
+        [
+          -0.186,
+          -0.12
+        ],
+        [
+          0.1,
+          -0.147
+        ],
+        [
+          0.145,
+          -0.147
+        ],
+        [
+          0.237,
+          -0.12
+        ],
+        [
+          0.237,
+          0.12
+        ],
+        [
+          0.145,
+          0.147
+        ],
+        [
+          0.1,
+          0.147
+        ],
+        [
+          -0.186,
+          0.12
+        ]
+      ],
+      "body_sweep_radius_m": 0.26734535916422786,
+      "wheel_radius_m": 0.03334335709255855,
+      "wheel_base_m": 0.08213,
+      "encoder_ticks_per_revolution": 942.4,
+      "left_distance_scale": 0.99761,
+      "right_distance_scale": 1.00239
+    },
+    "sensor": {
+      "beams_per_revolution": 360,
+      "angle_binning": "nearest_bin_center_ties_even_v1",
+      "physical_window_m": {
+        "minimum": 0.2,
+        "maximum": 8.0
+      },
+      "policy_range_m": {
+        "minimum": 0.15,
+        "maximum": 12.0
+      },
+      "missing_return": "positive_infinity_encoded_as_policy_maximum"
+    },
+    "simulation": {
+      "control_period_s": 0.1,
+      "collision_geometry": "convex_guard_polygon_cell_circumcircles_v1",
+      "angular_response_time_s": 0.55,
+      "linear_response_fraction_per_step": 0.5
+    },
+    "actions": {
+      "outputs": [
+        "linear_x_mps",
+        "angular_z_radps"
+      ],
+      "linear_x_mps": {
+        "minimum": 0.0,
+        "maximum": 0.25
+      },
+      "angular_z_radps": {
+        "minimum": -0.25,
+        "maximum": 0.25
+      },
+      "sample_space": [
+        -1.0,
+        1.0
+      ]
+    },
+    "inference": {
+      "wrapper": "reflection_ensemble_mean_v1",
+      "base_model": "actor_mlp_228_128_128_64_2_v1",
+      "passes": 2,
+      "reflection_axis": "base_link_x",
+      "feature_transform": "mirror_every_lidar_view_and_path_lateral_and_angular_velocity",
+      "output_transform": "preserve_linear_and_negate_angular",
+      "aggregation": "arithmetic_mean_of_direct_and_reflected_outputs",
+      "formula": "0.5*(actor(x)+mirror_twist(actor(mirror_features(x))))"
+    }
+  },
+  "contract_digest": "ef46a288253d12c332fd327a0666f920968d0d9b5416faf9e3b2a9d550b4096a",
+  "inference_wrapper": "reflection_ensemble_mean_v1",
+  "guard_included": false,
+  "feature_extractor_included": false,
+  "vectors": 128,
+  "host_max_abs_error": 2.9802322387695312e-08,
+  "existing_validator": "_validate_onnx: graph contract plus 16 normalization-scale probes passed",
+  "files": {
+    "actor.onnx": "eb9647e44d21d2929b6865beb909a2a59340ee5938fa2fd1ff46eb0f51c51a51",
+    "parity.npz": "18423454315460fe0e5b7491c7d10a9b3a6ae22c3ef41edb8c247a12348224d0"
+  }
+}

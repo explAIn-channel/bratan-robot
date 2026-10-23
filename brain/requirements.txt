@@ -1,0 +1,9 @@
+numpy
+scipy
+opencv-python-headless
+onnxruntime
+vosk
+websockets
+pyyaml
+edge-tts
+aiohttp

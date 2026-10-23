@@ -1,0 +1,4 @@
+{
+  "about": "Taught passages: narrow doorways that are always taken along one line. The owner puts the robot on the line once; the robot gets onto it from `approach` m behind, then drives it straight for `length` at `speed`; from `tight_from` m on there is no room to settle onto the line. Coordinates are in the frame of your own map. Example entry: {\"name\": \"corridor->kitchen\", \"start\": [x, y, heading], \"length\": 1.9, \"speed\": 0.24, \"approach\": 0.4, \"tight_from\": 0.7, \"gate\": [x, y]}.",
+  "passages": []
+}

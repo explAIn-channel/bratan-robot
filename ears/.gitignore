@@ -1,0 +1,5 @@
+.pio/
+.ota-pass*
+*.wav
+.ushi-ip
+.ble-token

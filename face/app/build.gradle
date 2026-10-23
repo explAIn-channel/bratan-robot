@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+}
+
+def provisionerPublicKeyDerB64 = providers.gradleProperty(
+        "robotbrainProvisionerPublicKeyDerB64").orElse("").get()
+if (!(provisionerPublicKeyDerB64 ==~ /[A-Za-z0-9+\/=]*/)) {
+    throw new GradleException("robotbrain provisioner public key is not base64")
+}
+def releaseSigning = [
+        keystore: System.getenv("ROBOTBRAIN_ANDROID_KEYSTORE") ?: "",
+        alias: System.getenv("ROBOTBRAIN_ANDROID_KEY_ALIAS") ?: "",
+        storePassword: System.getenv("ROBOTBRAIN_ANDROID_STORE_PASSWORD") ?: "",
+        keyPassword: System.getenv("ROBOTBRAIN_ANDROID_KEY_PASSWORD") ?: "",
+]
+// The body's ears stream only to whoever writes this token (C52, 18.10): the same one is built into the board
+// (work/ushi/.ble-token, passed in the environment by work/checks/build_face_ble.py — never on a command line).
+def earsToken = System.getenv("ROBOTBRAIN_EARS_TOKEN") ?: ""
+if (!(earsToken ==~ /[A-Za-z0-9]*/)) {
+    throw new GradleException("ears token must be letters and digits")
+}
+def releaseRequested = gradle.startParameter.taskNames.any {
+    it.toLowerCase(java.util.Locale.ROOT).contains("release")
+}
+if (releaseRequested && releaseSigning.values().any { !it }) {
+    throw new GradleException("RobotBrain release signing environment is incomplete")
+}
+
+android {
+    namespace 'ai.robotbrain.face'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'ai.robotbrain.face'
+        minSdk 27
+        targetSdk 35
+        versionCode 97
+        versionName '5.14.6-quick-wake'
+        buildConfigField "String", "ROBOTBRAIN_PROVISIONER_PUBLIC_KEY_DER_B64",
+                "\"${provisionerPublicKeyDerB64}\""
+        buildConfigField "String", "EARS_TOKEN", "\"${earsToken}\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        release {
+            if (releaseSigning.values().every { it }) {
+                storeFile file(releaseSigning.keystore)
+                storePassword releaseSigning.storePassword
+                keyAlias releaseSigning.alias
+                keyPassword releaseSigning.keyPassword
+                enableV1Signing true
+                enableV2Signing true
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}

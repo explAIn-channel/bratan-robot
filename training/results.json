@@ -1,0 +1,57 @@
+{
+  "selected_checkpoint": "original-run/best.pt",
+  "selected_update": 1,
+  "selected_evaluation": {
+    "update": 1,
+    "steps": 1536,
+    "reward": 0.04281448945403099,
+    "elapsed_s": 101.4,
+    "inference_wrapper": "reflection_ensemble_mean_v1",
+    "by_scenario": {
+      "clear": {
+        "episodes": 120,
+        "initial_world_rejections": [],
+        "arrived": 1.0,
+        "collision": 0.0,
+        "timeout": 0.0,
+        "mean_steps": 235.4,
+        "mean_jerk": 0.011626843860243942
+      },
+      "static": {
+        "episodes": 120,
+        "initial_world_rejections": [],
+        "arrived": 0.9666666666666667,
+        "collision": 0.008333333333333333,
+        "timeout": 0.025,
+        "mean_steps": 257.90833333333336,
+        "mean_jerk": 0.01127892028119224
+      },
+      "standing": {
+        "episodes": 120,
+        "initial_world_rejections": [],
+        "arrived": 0.9916666666666667,
+        "collision": 0.008333333333333333,
+        "timeout": 0.0,
+        "mean_steps": 249.275,
+        "mean_jerk": 0.011617273034949922
+      }
+    },
+    "selection_score": {
+      "worst_gate_progress": 0.9916666666666667,
+      "mean_gate_progress": 0.9944444444444445,
+      "mean_arrival": 0.9861111111111112,
+      "negative_max_collision": -0.008333333333333333,
+      "negative_mean_collision": -0.005555555555555556
+    }
+  },
+  "original_run_completed_updates": 800,
+  "original_run_exit": {
+    "returncode": 1,
+    "utc": "2026-09-06T03:27:55.503374+00:00"
+  },
+  "notes": [
+    "Selected-evaluation results are model-selection evidence, not independent final acceptance.",
+    "Original final metrics file was not written because the scenario-set validator failed.",
+    "No live robot acceptance is claimed."
+  ]
+}

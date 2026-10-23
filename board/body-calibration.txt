@@ -1,0 +1,15 @@
+tick_m 0.00022230739747029513
+left_scale 0.99761
+right_scale 1.00239
+track 0.08213
+gyro_scale 0.00017648
+linear_scale 4316.190456684954
+angular_scale 521.827426213211
+heading_gain 1.8
+angular_limit 0.6
+linear_accel 0.4
+angular_accel 0.8
+command_timeout 0.75
+pivot_kp 1.0
+pivot_ki 1.5
+pivot_effort_limit 1.0
