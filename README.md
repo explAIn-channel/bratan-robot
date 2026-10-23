@@ -17,7 +17,7 @@ Lidar mapping and localization, path planning and docking, YOLO vision, a voice 
 [![Tests](https://img.shields.io/badge/pytest-4877-2ea44f)](brain/tests)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
 
-[Making-of video](https://www.youtube.com/@explAIn_ru) · [Architecture](#architecture) · [Setup](#setup) · [Limitations](#limitations)
+[Making-of video](https://www.youtube.com/@explAIn_ru) · [3D model](#3d-model) · [Architecture](#architecture) · [Setup](#setup) · [Limitations](#limitations)
 
 </div>
 
@@ -72,6 +72,33 @@ Everything is tuned to one robot in one home, so treat it as a set of working pa
 | Body | PLA, white and orange | ~2 spools | $20 | 25 parts, Anycubic Kobra 3 |
 
 Ears wiring is an interactive 3D walkthrough, [`ears/provodka-bratana.html`](ears/provodka-bratana.html); microphone placement in the body is [`ears/korpus/index.html`](ears/korpus/index.html).
+
+## 3D model
+
+<div align="center">
+<img src="docs/media/print_assembly.gif" width="720" alt="The body printed part by part and assembled">
+</div>
+
+The R5 body is designed around the vacuum chassis and printed in PLA on an Anycubic Kobra 3 (250 × 250 mm bed): white structure plus orange inlays that give the corgi look — ears on the roof, a face window for the phone, "paws" on the bumpers.
+The files in [`body/`](body) are exactly what is printed and mounted on the robot.
+
+<img src="docs/media/body_hero.jpg" width="49%" alt="Render of the assembled body"> <img src="docs/media/body_assembly.gif" width="49%" alt="The body assembling from its parts">
+
+| | |
+|---|---|
+| Size | 409 × 234 mm, 286 mm across the ears; 199 mm to the roof, 236 mm with the lidar frame; floor 23 mm above the ground |
+| White parts (13) | floor in three sections, four side walls, front and rear walls, three lids, bottomless lidar carrier |
+| Orange parts (12) | side, front (two halves), rear, roof and ear inlays, rear lid inlay |
+| Assembly | glued; the lidar carrier sits in a window in the roof |
+| Material | PLA, about two spools |
+
+- [`body/bratan_body_r5.stl`](body/bratan_body_r5.stl) — the assembled body; GitHub opens it as an interactive 3D view.
+- [`body/print/white/`](body/print/white), [`body/print/orange/`](body/print/orange) — every part, already oriented for printing (inlays face down).
+- [`body/bratan_body_r5.glb`](body/bratan_body_r5.glb) — the assembly in colour for Blender or any glTF viewer.
+
+<div align="center">
+<img src="docs/media/all_parts.gif" width="720" alt="All parts laid out">
+</div>
 
 ## Architecture
 
